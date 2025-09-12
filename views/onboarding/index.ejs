@@ -1,0 +1,291 @@
+<div id="onboardingRoot" data-current-step="<%= currentStep || 1 %>"></div>
+
+<div class="onboarding-container">
+    <!-- Progress Bar -->
+    <div class="onboarding-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+        </div>
+        <div class="progress-steps">
+            <div class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-label">Account Type</span>
+            </div>
+            <div class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-label">Business Info</span>
+            </div>
+            <div class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-label">Brand</span>
+            </div>
+            <div class="step" data-step="4">
+                <span class="step-number">4</span>
+                <span class="step-label">Platforms</span>
+            </div>
+            <div class="step" data-step="5">
+                <span class="step-number">5</span>
+                <span class="step-label">Online Presence</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onboarding Card -->
+    <div class="onboarding-card">
+        <!-- Step 1: Account Type -->
+        <div class="onboarding-step" id="step1" data-step="1">
+            <h2 class="step-title">Let's get to know you</h2>
+            <p class="step-subtitle">Are you signing up as an individual or a company?</p>
+
+            <div class="account-type-selector">
+                <label class="account-type-option">
+                    <input type="radio" name="accountType" value="individual" id="individualType" />
+                    <div class="option-card">
+                        <i class="fas fa-user"></i>
+                        <h3>Individual</h3>
+                        <p>Personal account for freelancers and solopreneurs</p>
+                    </div>
+                </label>
+
+                <label class="account-type-option">
+                    <input type="radio" name="accountType" value="company" id="companyType" />
+                    <div class="option-card">
+                        <i class="fas fa-building"></i>
+                        <h3>Company</h3>
+                        <p>Business account for teams and organizations</p>
+                    </div>
+                </label>
+            </div>
+
+            <div class="name-input" id="nameInput" style="display: none">
+                <label class="form-label" id="nameLabel">Full Name</label>
+                <input
+                    type="text"
+                    class="form-input"
+                    id="nameField"
+                    placeholder="Enter your name"
+                />
+                <span class="form-error" id="nameError"></span>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-primary" onclick="saveStep1()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Business Information -->
+        <div class="onboarding-step" id="step2" data-step="2" style="display: none">
+            <h2 class="step-title">Tell us about your business</h2>
+            <p class="step-subtitle">
+                This helps us understand your design needs better (optional)
+            </p>
+
+            <div class="form-group">
+                <label class="form-label">Business Description</label>
+                <textarea
+                    class="form-input"
+                    id="businessDescription"
+                    rows="4"
+                    placeholder="What does your business do?"
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Audience</label>
+                <input
+                    type="text"
+                    class="form-input"
+                    id="targetAudience"
+                    placeholder="Who are your customers?"
+                />
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+                <button class="btn btn-outline" onclick="skipStep(2)">Skip</button>
+                <button class="btn btn-primary" onclick="saveStep2()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Brand Guidelines -->
+        <div class="onboarding-step" id="step3" data-step="3" style="display: none">
+            <h2 class="step-title">Brand Guidelines</h2>
+            <p class="step-subtitle">Share your brand assets and preferences (optional)</p>
+
+            <div class="upload-section">
+                <label class="upload-area" id="logoUpload">
+                    <input
+                        type="file"
+                        accept="image/*,.pdf,.zip"
+                        id="brandFile"
+                        style="display: none"
+                    />
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Upload logo or brand guidelines</p>
+                    <span>PDF, ZIP, or image files</span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Preferred Fonts</label>
+                <input
+                    type="text"
+                    class="form-input"
+                    id="preferredFonts"
+                    placeholder="e.g., Helvetica, Arial, Roboto"
+                />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Brand Colors</label>
+                <div class="color-inputs" id="colorInputs">
+                    <div class="color-input-group">
+                        <input type="text" class="form-input color-hex" placeholder="#000000" />
+                        <input type="color" class="color-picker" />
+                        <button class="btn-icon" onclick="removeColor(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="addColorInput()">
+                    <i class="fas fa-plus"></i> Add Color
+                </button>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+                <button class="btn btn-outline" onclick="skipStep(3)">Skip</button>
+                <button class="btn btn-primary" onclick="saveStep3()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Design Platforms -->
+        <div class="onboarding-step" id="step4" data-step="4" style="display: none">
+            <h2 class="step-title">Where will you use these designs?</h2>
+            <p class="step-subtitle">Select all that apply (optional)</p>
+
+            <div class="platforms-grid">
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="linkedin" />
+                    <div class="platform-card">
+                        <i class="fab fa-linkedin"></i>
+                        <span>LinkedIn</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="instagram" />
+                    <div class="platform-card">
+                        <i class="fab fa-instagram"></i>
+                        <span>Instagram</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="facebook" />
+                    <div class="platform-card">
+                        <i class="fab fa-facebook"></i>
+                        <span>Facebook</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="twitter" />
+                    <div class="platform-card">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="youtube" />
+                    <div class="platform-card">
+                        <i class="fab fa-youtube"></i>
+                        <span>YouTube</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="website" />
+                    <div class="platform-card">
+                        <i class="fas fa-globe"></i>
+                        <span>Website</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="emailMarketing" />
+                    <div class="platform-card">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </div>
+                </label>
+                <label class="platform-option">
+                    <input type="checkbox" name="platform" value="printMaterials" />
+                    <div class="platform-card">
+                        <i class="fas fa-print"></i>
+                        <span>Print</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-secondary" onclick="goToStep(3)">Back</button>
+                <button class="btn btn-outline" onclick="skipStep(4)">Skip</button>
+                <button class="btn btn-primary" onclick="saveStep4()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Online Presence -->
+        <div class="onboarding-step" id="step5" data-step="5" style="display: none">
+            <h2 class="step-title">Your online presence</h2>
+            <p class="step-subtitle">Share your website and social media (optional)</p>
+
+            <div class="form-group">
+                <label class="form-label">Website</label>
+                <input
+                    type="url"
+                    class="form-input"
+                    id="website"
+                    placeholder="https://www.yourwebsite.com"
+                />
+            </div>
+
+            <div class="social-links">
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-linkedin"></i> LinkedIn</label>
+                    <input
+                        type="text"
+                        class="form-input"
+                        name="social"
+                        data-platform="linkedin"
+                        placeholder="linkedin.com/company/yourcompany"
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-instagram"></i> Instagram</label>
+                    <input
+                        type="text"
+                        class="form-input"
+                        name="social"
+                        data-platform="instagram"
+                        placeholder="@yourhandle"
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fab fa-facebook"></i> Facebook</label>
+                    <input
+                        type="text"
+                        class="form-input"
+                        name="social"
+                        data-platform="facebook"
+                        placeholder="facebook.com/yourpage"
+                    />
+                </div>
+            </div>
+
+            <div class="step-actions">
+                <button class="btn btn-secondary" onclick="goToStep(4)">Back</button>
+                <button class="btn btn-outline" onclick="skipStep(5)">Skip & Finish</button>
+                <button class="btn btn-primary" onclick="saveStep5()">Complete Setup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modals -->
+<%- include('../partials/modals/base-modals') %>

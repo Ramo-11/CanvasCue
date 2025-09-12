@@ -1,0 +1,200 @@
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1>Welcome back, <%= user.displayName || user.email %>!</h1>
+            <p class="header-subtitle">
+                <% if (hasActiveSubscription) { %> You have <%=
+                subscription.tier.features.designsPerMonth - subscription.usage.designsUsedThisMonth
+                %> designs remaining this month <% } else { %> Choose a subscription plan to start
+                creating design requests <% } %>
+            </p>
+        </div>
+        <div class="header-actions">
+            <% if (hasActiveSubscription) { %>
+            <a href="/requests/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Request
+            </a>
+            <% } else { %>
+            <a href="/subscription" class="btn btn-primary">
+                <i class="fas fa-crown"></i> Choose Plan
+            </a>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-paint-brush"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value"><%= stats.total || 0 %></h3>
+                <p class="stat-label">Total Requests</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value"><%= stats.inProgress || 0 %></h3>
+                <p class="stat-label">In Progress</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value"><%= stats.completed || 0 %></h3>
+                <p class="stat-label">Completed</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-redo"></i>
+            </div>
+            <div class="stat-content">
+                <h3 class="stat-value"><%= stats.avgRevisions || 0 %></h3>
+                <p class="stat-label">Avg. Revisions</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <!-- Subscription Status -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Subscription Status</h2>
+                <a href="/subscription" class="btn btn-sm btn-outline">Manage</a>
+            </div>
+            <div class="subscription-card">
+                <% if (hasActiveSubscription) { %>
+                <div class="subscription-active">
+                    <div class="subscription-tier">
+                        <span class="tier-badge"><%= subscription.tier.displayName %></span>
+                        <span class="billing-period"><%= subscription.billingPeriod %></span>
+                    </div>
+                    <div class="subscription-usage">
+                        <div class="usage-bar">
+                            <div
+                                class="usage-fill"
+                                data-usage="<%= subscription.usage.designsUsedThisMonth %>"
+                                data-limit="<%= subscription.tier.features.designsPerMonth %>"
+                            ></div>
+                        </div>
+                        <p class="usage-text">
+                            <%= subscription.usage.designsUsedThisMonth %> of <%=
+                            subscription.tier.features.designsPerMonth %> designs used
+                        </p>
+                    </div>
+                    <div class="subscription-details">
+                        <p>
+                            <i class="fas fa-layers"></i> <%=
+                            subscription.usage.activeDesignRequests %> of <%=
+                            subscription.tier.features.simultaneousDesigns %> active requests
+                        </p>
+                        <p>
+                            <i class="fas fa-calendar"></i> Renews <%= new
+                            Date(subscription.nextBillingDate).toLocaleDateString() %>
+                        </p>
+                    </div>
+                </div>
+                <% } else { %>
+                <div class="subscription-empty">
+                    <i class="fas fa-crown"></i>
+                    <h3>No Active Subscription</h3>
+                    <p>Choose a plan to start requesting designs</p>
+                    <a href="/subscription" class="btn btn-primary">View Plans</a>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Recent Requests -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Recent Requests</h2>
+                <a href="/requests" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            <% if (recentRequests && recentRequests.length > 0) { %>
+            <div class="requests-list">
+                <% recentRequests.forEach(request => { %>
+                <div
+                    class="request-item"
+                    onclick="window.location.href='/requests/<%= request._id %>'"
+                >
+                    <div class="request-status">
+                        <span class="status-badge status-<%= request.status %>">
+                            <%= request.status.replace('-', ' ') %>
+                        </span>
+                    </div>
+                    <div class="request-info">
+                        <h4><%= request.title %></h4>
+                        <p class="request-meta">
+                            #<%= request.requestNumber %> • <%= request.category.replace('-', ' ')
+                            %> • <%= new Date(request.createdAt).toLocaleDateString() %>
+                        </p>
+                    </div>
+                    <div class="request-priority">
+                        <% if (request.priority === 'urgent') { %>
+                        <span class="priority-badge priority-urgent">Urgent</span>
+                        <% } else if (request.priority === 'high') { %>
+                        <span class="priority-badge priority-high">High</span>
+                        <% } %>
+                    </div>
+                    <div class="request-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+            <% } else { %>
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <h3>No requests yet</h3>
+                <p>Create your first design request to get started</p>
+                <% if (hasActiveSubscription) { %>
+                <a href="/requests/new" class="btn btn-primary">Create Request</a>
+                <% } %>
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+            <a href="/requests/new" class="action-card">
+                <i class="fas fa-plus-circle"></i>
+                <span>New Request</span>
+            </a>
+            <a href="/settings#brand" class="action-card">
+                <i class="fas fa-palette"></i>
+                <span>Brand Guidelines</span>
+            </a>
+            <a href="/subscription" class="action-card">
+                <i class="fas fa-credit-card"></i>
+                <span>Billing</span>
+            </a>
+            <a href="/settings" class="action-card">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard data root -->
+<div
+    id="dashboardRoot"
+    data-has-subscription="<%= hasActiveSubscription %>"
+    data-subscription="<%= JSON.stringify(subscription || null) %>"
+    data-stats="<%= JSON.stringify(stats || {}) %>"
+></div>

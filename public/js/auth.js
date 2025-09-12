@@ -198,10 +198,6 @@ async function submitLogin(formData) {
             setTimeout(() => {
                 window.location.href = result.redirectUrl || '/dashboard';
             }, 500);
-        } else {
-            // showError('passwordError', result.message || 'Invalid email or password');
-            // submitBtn.classList.remove('loading');
-            // submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Login error:', error);

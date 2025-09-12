@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../../models/User');
 const Onboarding = require('../../models/Onboarding');
 const SubscriptionTier = require('../../models/SubscriptionTier');
@@ -5,7 +6,7 @@ const { createAppLogger, createStorageService, createNotificationService } = req
 
 const logger = createAppLogger();
 const storage = createStorageService();
-const notifications = createNotificationService({
+const notifications = createNotificationService(mongoose, {
     types: ['onboarding_complete', 'profile_updated'],
     relatedModels: ['User', 'Onboarding'],
 });
@@ -215,10 +216,11 @@ const saveBrandGuidelines = async (req, res) => {
 
         // Process colors (expecting array of color objects)
         if (brandColors && Array.isArray(brandColors)) {
+            const validUsages = ['primary', 'secondary', 'accent', 'text', 'background', 'other'];
             onboarding.brandGuidelines.brandColors = brandColors.map((color) => ({
                 name: color.name || '',
                 hex: color.hex || '',
-                usage: color.usage || 'other',
+                usage: validUsages.includes(color.usage) ? color.usage : 'other',
             }));
         }
 

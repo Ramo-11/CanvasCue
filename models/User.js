@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema(
             minlength: 6,
         },
 
+        // User Role
+        role: {
+            type: String,
+            enum: ['client', 'designer', 'admin'],
+            default: 'client',
+            required: true,
+        },
+
         // Account Status
         isActive: {
             type: Boolean,
@@ -51,14 +59,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: ['individual', 'company', null],
             default: null,
-        },
-
-        role: {
-            type: String,
-            enum: ['client', 'designer', 'admin'],
-            default: 'client',
-            required: true,
-            index: true,
         },
 
         // Profile Information
@@ -107,7 +107,8 @@ const userSchema = new mongoose.Schema(
 );
 
 // Indexes for performance
-userSchema.index({ isActive: 1 });
+userSchema.index({ email: 1, isActive: 1 });
+userSchema.index({ createdAt: -1 });
 userSchema.index({ stripeCustomerId: 1 });
 
 // Virtual for display name
@@ -203,4 +204,4 @@ userSchema.set('toJSON', {
     },
 });
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);

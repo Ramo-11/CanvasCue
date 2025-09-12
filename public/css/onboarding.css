@@ -1,0 +1,412 @@
+/* Onboarding Styles */
+.onboarding-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: var(--spacing-lg);
+}
+
+/* Progress Bar */
+.onboarding-progress {
+    max-width: 800px;
+    margin: 0 auto var(--spacing-2xl);
+}
+
+.progress-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+    margin-bottom: var(--spacing-lg);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--white);
+    border-radius: var(--border-radius-full);
+    transition: width var(--transition-normal);
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+    opacity: 0.6;
+    transition: opacity var(--transition-fast);
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--border-radius-full);
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-fast);
+}
+
+.step.active .step-number {
+    background: var(--white);
+    color: var(--primary-color);
+}
+
+.step.completed .step-number {
+    background: var(--success-color);
+    color: var(--white);
+}
+
+.step.completed .step-number::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.step-label {
+    color: var(--white);
+    font-size: var(--font-size-xs);
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Onboarding Card */
+.onboarding-card {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-2xl);
+    padding: var(--spacing-2xl);
+}
+
+.onboarding-step {
+    animation: fadeIn var(--transition-normal);
+}
+
+.step-title {
+    font-size: var(--font-size-2xl);
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-sm);
+    text-align: center;
+}
+
+.step-subtitle {
+    color: var(--gray-600);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* Account Type Selector */
+.account-type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.account-type-option input {
+    display: none;
+}
+
+.option-card {
+    padding: var(--spacing-xl);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.option-card:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-50);
+}
+
+.account-type-option input:checked + .option-card {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.option-card i {
+    font-size: var(--font-size-3xl);
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.option-card h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+}
+
+.option-card p {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Name Input */
+.name-input {
+    margin-bottom: var(--spacing-xl);
+    animation: slideDown var(--transition-normal);
+}
+
+/* Upload Section */
+.upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-2xl);
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--border-radius-lg);
+    background: var(--gray-50);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: var(--spacing-lg);
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.upload-area i {
+    font-size: var(--font-size-3xl);
+    color: var(--gray-400);
+    margin-bottom: var(--spacing-md);
+}
+
+.upload-area p {
+    font-weight: var(--font-weight-medium);
+    color: var(--gray-700);
+    margin-bottom: var(--spacing-xs);
+}
+
+.upload-area span {
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+}
+
+/* Color Inputs */
+.color-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.color-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.color-hex {
+    flex: 1;
+}
+
+.color-picker {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: var(--white);
+}
+
+/* Platforms Grid */
+.platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.platform-option input {
+    display: none;
+}
+
+.platform-card {
+    padding: var(--spacing-md);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--border-radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.platform-card:hover {
+    border-color: var(--primary-color);
+    background: var(--gray-50);
+}
+
+.platform-option input:checked + .platform-card {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.platform-card i {
+    font-size: var(--font-size-xl);
+    color: var(--gray-600);
+}
+
+.platform-option input:checked + .platform-card i {
+    color: var(--primary-color);
+}
+
+.platform-card span {
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.social-links .form-label i {
+    margin-right: var(--spacing-sm);
+    color: var(--gray-500);
+}
+
+/* Step Actions */
+.step-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-2xl);
+}
+
+.step-actions .btn {
+    min-width: 120px;
+}
+
+.step-actions .btn-secondary {
+    margin-right: auto;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--gray-700);
+    font-size: var(--font-size-sm);
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 200px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .account-type-selector {
+        grid-template-columns: 1fr;
+    }
+
+    .platforms-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .progress-steps {
+        display: none;
+    }
+
+    .onboarding-card {
+        padding: var(--spacing-xl);
+    }
+
+    .step-actions {
+        flex-wrap: wrap;
+    }
+
+    .step-actions .btn {
+        flex: 1;
+        min-width: 100px;
+    }
+}
