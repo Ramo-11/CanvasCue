@@ -295,7 +295,6 @@ const designRequestSchema = new mongoose.Schema(
 // Indexes for performance
 designRequestSchema.index({ client: 1, status: 1, createdAt: -1 });
 designRequestSchema.index({ designer: 1, status: 1, priority: -1 });
-designRequestSchema.index({ requestNumber: 1 });
 designRequestSchema.index({ deadline: 1, status: 1 });
 
 // Virtual for turnaround time
@@ -500,4 +499,5 @@ designRequestSchema.set('toJSON', {
     virtuals: true,
 });
 
-module.exports = mongoose.model('DesignRequest', designRequestSchema);
+module.exports =
+    mongoose.models.DesignRequest || mongoose.model('DesignRequest', designRequestSchema);

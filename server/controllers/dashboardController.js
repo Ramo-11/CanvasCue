@@ -3,24 +3,15 @@ const Onboarding = require('../../models/Onboarding');
 const DesignRequest = require('../../models/DesignRequest');
 const Subscription = require('../../models/Subscription');
 const SubscriptionTier = require('../../models/SubscriptionTier');
-const {
-    createAppLogger,
-    createEmailService,
-    createStorageService,
-    createStripeService,
-    createValidationService,
-    createNotificationService,
-} = require('@sahab/core');
 
-const logger = createAppLogger();
-const emailService = createEmailService();
-const storage = createStorageService();
-const stripeService = createStripeService();
-const validation = createValidationService();
-const notifications = createNotificationService({
-    types: ['request_created', 'request_updated', 'subscription_changed'],
-    relatedModels: ['DesignRequest', 'Subscription'],
-});
+const {
+    logger,
+    emailService,
+    storage,
+    stripeService,
+    validation,
+    notifications,
+} = require('../utils/services');
 
 /**
  * Show main dashboard
@@ -234,7 +225,7 @@ const createRequest = async (req, res) => {
         await subscription.updateActiveDesigns(activeCount);
 
         // Send notification
-        await notifications.create(
+        await notifications().create(
             userId,
             'request_created',
             'Design Request Created',

@@ -157,7 +157,6 @@ const subscriptionTierSchema = new mongoose.Schema(
 );
 
 // Indexes
-subscriptionTierSchema.index({ tierLevel: 1 });
 subscriptionTierSchema.index({ isActive: 1, isAvailable: 1 });
 subscriptionTierSchema.index({ sortOrder: 1 });
 
@@ -361,4 +360,5 @@ subscriptionTierSchema.set('toJSON', {
     virtuals: true,
 });
 
-module.exports = mongoose.model('SubscriptionTier', subscriptionTierSchema);
+module.exports =
+    mongoose.models.SubscriptionTier || mongoose.model('SubscriptionTier', subscriptionTierSchema);

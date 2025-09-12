@@ -3,42 +3,33 @@ const expressLayouts = require('express-ejs-layouts');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+require('dotenv').config({ quiet: true });
+
+// Local utilities
+const connectDB = require('./server/controllers/dbController');
+const { sessionMiddleware } = require('./server/middleware/session/sessionMiddleware');
+const { sessionValidator } = require('./server/middleware/session/sessionValidator');
 
 // Import from Sahab core utilities
-const {
-    createAppLogger,
-    createDB,
-    createSessionMiddleware,
-    createAuthMiddleware,
-    createSessionValidator,
-} = require('@sahab/core');
+const { createAppLogger, createAuthMiddleware } = require('@sahab/core');
 
+const User = require('./models/User');
 const router = require('./server/router');
-
-const logger = createAppLogger();
-
-const { validateSession, enforceRole } = createSessionValidator({
-    UserModel: require('./models/User'),
-    logger,
-    loginPath: '/login',
-    roleRedirects: {
-        '/admin': ['admin'],
-        '/dashboard': ['admin', 'user'],
-    },
-});
 
 // ********** End Imports **********
 
 // ********** Initialization **************
 const app = express();
-require('dotenv').config({ quiet: true });
+const logger = createAppLogger();
 
-const db = createDB({ logger });
+// Connect DB
+logger.info('Running in ' + process.env.NODE_ENV + ' mode');
+connectDB();
+
+// Auth middleware from sahab-core
 const auth = createAuthMiddleware();
 
-logger.info('Running in ' + process.env.NODE_ENV + ' mode');
-db.connect();
-
+// View engine setup
 app.set('view engine', 'ejs');
 app.set('views', './views');
 app.use(expressLayouts);
@@ -54,17 +45,36 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 // Session
-app.use(createSessionMiddleware());
+app.use(
+    sessionMiddleware({
+        secret: process.env.SESSION_SECRET,
+        cookieName: 'canvascue.sid',
+        logger,
+    })
+);
 
-// Auth middleware
+// Session validator (local)
+const { validateSession, enforceRole } = sessionValidator({
+    UserModel: User,
+    logger,
+    loginPath: '/login',
+    roleRedirects: {
+        '/admin': ['admin'],
+        '/dashboard': ['admin', 'client', 'designer'],
+    },
+});
+
+// Auth + session middlewares
 app.use(validateSession);
 app.use(enforceRole);
 app.use(auth.attachUser);
 
 // ********** End Initialization **********
 
+// Router
 app.use('/', router);
 
+// Start server
 app.listen(process.env.PORT, () =>
     logger.info(`Server running on http://localhost:${process.env.PORT}`)
 );

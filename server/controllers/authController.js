@@ -1,10 +1,14 @@
 const User = require('../../models/User');
 const Onboarding = require('../../models/Onboarding');
-const { createAppLogger, createEmailService, createValidationService } = require('@sahab/core');
 
-const logger = createAppLogger();
-const emailService = createEmailService();
-const validation = createValidationService();
+const {
+    logger,
+    emailService,
+    storage,
+    stripeService,
+    validation,
+    notifications,
+} = require('../utils/services');
 
 /**
  * Show login page
@@ -191,6 +195,7 @@ const signup = async (req, res) => {
             isActive: true,
             onboardingCompleted: false,
             onboardingStep: 1,
+            role: 'client',
         });
 
         await user.save();

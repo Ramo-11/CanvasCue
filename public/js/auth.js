@@ -199,10 +199,9 @@ async function submitLogin(formData) {
                 window.location.href = result.redirectUrl || '/dashboard';
             }, 500);
         } else {
-            Modal.error(result.message || 'Invalid email or password');
-            showError('passwordError', result.message || 'Invalid email or password');
-            submitBtn.classList.remove('loading');
-            submitBtn.disabled = false;
+            // showError('passwordError', result.message || 'Invalid email or password');
+            // submitBtn.classList.remove('loading');
+            // submitBtn.disabled = false;
         }
     } catch (error) {
         console.error('Login error:', error);

@@ -162,10 +162,7 @@ const subscriptionSchema = new mongoose.Schema(
 );
 
 // Indexes
-subscriptionSchema.index({ user: 1, status: 1 });
-subscriptionSchema.index({ nextBillingDate: 1, status: 1 });
 subscriptionSchema.index({ currentPeriodEnd: 1 });
-subscriptionSchema.index({ stripeSubscriptionId: 1 });
 
 // Virtual to check if subscription is active
 subscriptionSchema.virtual('isActive').get(function () {
@@ -334,4 +331,4 @@ subscriptionSchema.set('toJSON', {
     virtuals: true,
 });
 
-module.exports = mongoose.model('Subscription', subscriptionSchema);
+module.exports = mongoose.models.Subscription || mongoose.model('Subscription', subscriptionSchema);

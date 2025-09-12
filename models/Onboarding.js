@@ -220,7 +220,6 @@ const onboardingSchema = new mongoose.Schema(
 );
 
 // Indexes
-onboardingSchema.index({ user: 1 });
 onboardingSchema.index({ 'completedSteps.accountType': 1 });
 onboardingSchema.index({ completedAt: 1 });
 
@@ -310,4 +309,4 @@ onboardingSchema.set('toJSON', {
     virtuals: true,
 });
 
-module.exports = mongoose.model('Onboarding', onboardingSchema);
+module.exports = mongoose.models.Onboarding || mongoose.model('Onboarding', onboardingSchema);
