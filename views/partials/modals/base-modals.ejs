@@ -1,0 +1,125 @@
+<!-- Success Modal -->
+<div id="successModal" class="modal modal-alert modal-success modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-icon-wrapper">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="modal-title">Success!</h3>
+            <p class="modal-message">Operation completed successfully.</p>
+            <button class="btn btn-success btn-block" onclick="closeModal('successModal')">
+                OK
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div id="errorModal" class="modal modal-alert modal-error modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-icon-wrapper">
+                <i class="fas fa-times"></i>
+            </div>
+            <h3 class="modal-title">Error</h3>
+            <p class="modal-message">An error occurred. Please try again.</p>
+            <button class="btn btn-danger btn-block" onclick="closeModal('errorModal')">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Warning Modal -->
+<div id="warningModal" class="modal modal-alert modal-warning modal-sm">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="modal-icon-wrapper">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="modal-title">Warning</h3>
+            <p class="modal-message">Please review this carefully.</p>
+            <button class="btn btn-warning btn-block" onclick="closeModal('warningModal')">
+                Understood
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" class="modal modal-confirm modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Action</h3>
+            <button class="modal-close" onclick="closeModal('confirmModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to proceed?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('confirmModal')">
+                Cancel
+            </button>
+            <button class="btn btn-primary" id="confirmModalBtn">
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal modal-delete modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Delete Confirmation</h3>
+            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-message">Are you sure you want to delete this item?</p>
+            <div class="modal-warning-text">
+                <strong>Warning:</strong> This action cannot be undone.
+            </div>
+            <div class="delete-confirm-input">
+                <label>Type <strong>DELETE</strong> to confirm:</label>
+                <input type="text" class="form-input" id="deleteConfirmInput" placeholder="DELETE">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('deleteModal')">
+                Cancel
+            </button>
+            <button class="btn btn-danger" id="deleteConfirmBtn">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Generic Form Modal Template -->
+<div id="formModal" class="modal modal-form modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="formModalTitle">Form Title</h3>
+            <button class="modal-close" onclick="closeModal('formModal')">&times;</button>
+        </div>
+        <form id="formModalForm">
+            <div class="modal-body">
+                <div class="form-scroll">
+                    <!-- Form content will be inserted here -->
+                    <div id="formModalContent"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('formModal')">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-text">Save</span>
+                    <span class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Saving...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

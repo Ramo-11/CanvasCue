@@ -1,0 +1,36 @@
+<%
+// Generic page header - works for any project
+const headerTitle = locals.headerTitle || locals.title || 'Page Title';
+const headerSubtitle = locals.headerSubtitle || '';
+const showBackButton = locals.backButton !== false;
+const backUrl = locals.backUrl || 'javascript:history.back()';
+const backText = locals.backText || 'Back';
+const headerActions = locals.headerActions || [];
+%>
+
+<div class="page-header">
+    <div class="header-content">
+        <h1><%= headerTitle %></h1>
+        <% if (headerSubtitle) { %>
+            <p><%= headerSubtitle %></p>
+        <% } %>
+    </div>
+    <div class="header-actions">
+        <% if (showBackButton) { %>
+            <button class="btn btn-secondary" onclick="window.location.href='<%= backUrl %>'">
+                <i class="fas fa-arrow-left"></i> <%= backText %>
+            </button>
+        <% } %>
+        <% headerActions.forEach(action => { %>
+            <button 
+                class="btn <%= action.btnClass || 'btn-primary' %>" 
+                <% if (action.onclick) { %>onclick="<%= action.onclick %>"<% } %>
+                <% if (action.href) { %>onclick="window.location.href='<%= action.href %>'"<% } %>
+                <% if (action.id) { %>id="<%= action.id %>"<% } %>
+            >
+                <% if (action.icon) { %><i class="<%= action.icon %>"></i><% } %>
+                <%= action.text %>
+            </button>
+        <% }) %>
+    </div>
+</div>

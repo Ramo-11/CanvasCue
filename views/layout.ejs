@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="<%= locals.description || '' %>" />
+        <title><%= locals.title || 'App' %> | <%= locals.appName || 'Application' %></title>
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+        <!-- Font Awesome -->
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Core CSS -->
+        <link rel="stylesheet" href="/css/common.css" />
+
+        <!-- Additional CSS -->
+        <% if (locals.additionalCSS) { %> <% additionalCSS.forEach(css=> { %>
+        <link rel="stylesheet" href="/css/<%= css %>" />
+        <% }); %> <% } %> <%- locals.styles %>
+    </head>
+
+    <body>
+        <!-- Navigation -->
+        <% if (locals.showNav !==false) { %> <%- include('partials/nav') %> <% } %>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container"><%- body %></div>
+        </main>
+
+        <!-- Footer -->
+        <% if (locals.showFooter !==false) { %> <%- include('partials/footer') %> <% } %>
+
+        <!-- Core utilities - always include -->
+        <script src="/js/utils/api-client.js"></script>
+        <script src="/js/utils/form-manager.js"></script>
+        <script src="/js/utils/modal-manager.js"></script>
+
+        <!-- Optional utilities - include as needed -->
+        <script src="/js/utils/notification-manager.js"></script>
+        <script src="/js/utils/date-manager.js"></script>
+        <script src="/js/utils/storage-manager.js"></script>
+        <script src="/js/utils/helpers.js"></script>
+
+        <!-- Main common.js - must be last -->
+        <script src="/js/common.js"></script>
+        <script src="/js/layout.js"></script>
+        <script src="/js/nav.js"></script>
+        <script src="/js/footer.js"></script>
+
+        <!-- Additional JS -->
+        <% if (locals.additionalJS) { %> <% additionalJS.forEach(js=> { %>
+        <script src="/js/<%= js %>"></script>
+        <% }); %> <% } %> <%- locals.scripts %>
+    </body>
+</html>
