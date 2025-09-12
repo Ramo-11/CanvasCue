@@ -1,0 +1,99 @@
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a href="/" class="auth-logo">
+                <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 40 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <rect width="40" height="40" rx="8" fill="#3b82f6" />
+                    <path
+                        d="M10 20C10 14.4772 14.4772 10 20 10V10C25.5228 10 30 14.4772 30 20V20C30 25.5228 25.5228 30 20 30V30C14.4772 30 10 25.5228 10 20V20Z"
+                        fill="white"
+                        opacity="0.9"
+                    />
+                    <path
+                        d="M15 18L20 23L25 18"
+                        stroke="#3b82f6"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+            </a>
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Sign in to continue to CanvasCue</p>
+        </div>
+
+        <form id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-input"
+                    placeholder="you@example.com"
+                    required
+                    autofocus
+                />
+                <span class="form-error" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="form-label-wrapper">
+                    <label for="password" class="form-label">Password</label>
+                    <a href="/forgot-password" class="form-link">Forgot password?</a>
+                </div>
+                <div class="password-input-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        required
+                    />
+                    <button type="button" class="password-toggle" id="passwordToggle">
+                        <i class="fas fa-eye" id="passwordIcon"></i>
+                    </button>
+                </div>
+                <span class="form-error" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="remember" id="remember" />
+                    <span class="checkbox-label">Remember me for 30 days</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="btn-loading" style="display: none">
+                    <i class="fas fa-spinner fa-spin"></i> Signing in...
+                </span>
+            </button>
+
+            <div class="auth-divider">
+                <span>Don't have an account?</span>
+            </div>
+
+            <a href="/signup" class="btn btn-outline btn-block"> Create Account </a>
+        </form>
+
+        <div class="auth-footer">
+            <p class="auth-footer-text">
+                By signing in, you agree to our
+                <a href="/terms-of-service">Terms of Service</a> and
+                <a href="/privacy-policy">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Include Modals -->
+<%- include('../partials/modals/base-modals') %>
