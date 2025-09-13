@@ -42,6 +42,16 @@ router.post('/forgot-password', authController.forgotPassword);
 router.get('/reset-password/:token', authController.showResetPassword);
 router.post('/reset-password/:token', authController.resetPassword);
 
+const requireRole = (role) => (req, res, next) => {
+    if (req.session.userRole !== role) {
+        return res.status(403).render('error', {
+            title: 'Access Denied',
+            message: 'You do not have permission to access this page',
+        });
+    }
+    next();
+};
+
 /**
  * Protected Routes - Requires Authentication
  */
@@ -159,4 +169,4 @@ router.use((req, res) => {
     });
 });
 
-module.exports = rout;
+module.exports = router;
