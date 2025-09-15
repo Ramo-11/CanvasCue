@@ -31,11 +31,11 @@ const showDashboard = async (req, res) => {
         // Get statistics
         const stats = await getRequestStatistics(userId, 'client');
 
-        res.render('dashboard/client/index', {
+        res.render('client/dashboard', {
             title: 'Dashboard - CanvasCue',
             layout: 'layout',
-            additionalCSS: ['dashboard-shared.css', 'dashboard-client.css'],
-            additionalJS: ['dashboard-client.js'],
+            additionalCSS: ['dashboard-shared.css', 'client/dashboard.css'],
+            additionalJS: ['client/dashboard.js'],
             user: user.toJSON(),
             subscription: formatSubscriptionData(subscription),
             recentRequests,

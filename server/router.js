@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 // Controllers
 const authController = require('./controllers/authController');
-const onboardingController = require('./controllers/onboardingController');
+const onboardingController = require('./controllers/client/onboardingController');
 const clientDashboardController = require('./controllers/client/dashboardController');
+const clientRequestsController = require('./controllers/client/requestsController');
+const clientSubscriptionController = require('./controllers/client/subscriptionController');
+const clientSettingsController = require('./controllers/client/settingsController');
 // const designerDashboardController = require('./controllers/designer/dashboardController');
 // const adminDashboardController = require('./controllers/admin/dashboardController');
 
@@ -58,7 +63,7 @@ const requireRole = (role) => (req, res, next) => {
 const protectedRouter = express.Router();
 protectedRouter.use(auth.isAuthenticated);
 
-// Onboarding flow (only for new client users)
+// Onboarding flow (client specific)
 protectedRouter.get('/onboarding', onboardingController.showOnboarding);
 protectedRouter.post('/onboarding/account-type', onboardingController.saveAccountType);
 protectedRouter.post('/onboarding/business-info', onboardingController.saveBusinessInfo);
@@ -66,7 +71,7 @@ protectedRouter.post('/onboarding/brand-guidelines', onboardingController.saveBr
 protectedRouter.post('/onboarding/platforms', onboardingController.savePlatforms);
 protectedRouter.post('/onboarding/online-presence', onboardingController.saveOnlinePresence);
 protectedRouter.post('/onboarding/complete', onboardingController.completeOnboarding);
-protectedRouter.post('/onboarding/upload', onboardingController.uploadFile);
+protectedRouter.post('/onboarding/upload', upload.single('file'), onboardingController.uploadFile);
 
 /**
  * Client Routes
@@ -75,38 +80,55 @@ protectedRouter.post('/onboarding/upload', onboardingController.uploadFile);
 protectedRouter.get('/dashboard', clientDashboardController.showDashboard);
 
 // Design requests
-protectedRouter.get('/requests', clientDashboardController.showRequests);
-protectedRouter.get('/requests/new', clientDashboardController.showNewRequest);
-protectedRouter.post('/requests/new', clientDashboardController.createRequest);
-protectedRouter.get('/requests/:id', clientDashboardController.showRequest);
+protectedRouter.get('/requests', clientRequestsController.showRequests);
+protectedRouter.get('/requests/new', clientRequestsController.showNewRequest);
+protectedRouter.post(
+    '/requests/new',
+    upload.array('referenceFiles', 10),
+    clientRequestsController.createRequest
+);
+protectedRouter.get('/requests/:id', clientRequestsController.showRequest);
 
 // Subscription management
-protectedRouter.get('/subscription', clientDashboardController.showSubscription);
-protectedRouter.get('/subscription/upgrade', clientDashboardController.showUpgrade);
-protectedRouter.post('/subscription/upgrade', clientDashboardController.upgradeSubscription);
+protectedRouter.get('/subscription', clientSubscriptionController.showSubscription);
+protectedRouter.get('/subscription/upgrade', clientSubscriptionController.showUpgrade);
+protectedRouter.post('/subscription/upgrade', clientSubscriptionController.upgradeSubscription);
+protectedRouter.get(
+    '/subscription/success',
+    clientSubscriptionController.handleSubscriptionSuccess
+);
 
 // Account settings
-protectedRouter.get('/settings', clientDashboardController.showSettings);
-protectedRouter.post('/settings/profile', clientDashboardController.updateProfile);
-protectedRouter.post('/settings/password', clientDashboardController.updatePassword);
-protectedRouter.post('/settings/brand', clientDashboardController.updateBrand);
+protectedRouter.get('/settings', clientSettingsController.showSettings);
+protectedRouter.post('/settings/profile', clientSettingsController.updateProfile);
+protectedRouter.post('/settings/password', clientSettingsController.updatePassword);
+protectedRouter.post('/settings/brand', clientSettingsController.updateBrand);
+protectedRouter.post(
+    '/settings/brand/upload',
+    upload.single('file'),
+    clientSettingsController.uploadBrandFile
+);
+protectedRouter.delete(
+    '/settings/brand/file/:type/:fileId',
+    clientSettingsController.deleteBrandFile
+);
 
 /**
  * Designer Routes (to be implemented)
  */
-// protectedRouter.get('/designer/dashboard', designerDashboardController.showDashboard);
-// protectedRouter.get('/designer/assignments', designerDashboardController.showAssignments);
-// protectedRouter.get('/designer/available', designerDashboardController.showAvailable);
-// protectedRouter.post('/designer/claim/:id', designerDashboardController.claimRequest);
-// protectedRouter.post('/designer/complete/:id', designerDashboardController.completeRequest);
+// protectedRouter.get('/designer/dashboard', requireRole('designer'), designerDashboardController.showDashboard);
+// protectedRouter.get('/designer/assignments', requireRole('designer'), designerDashboardController.showAssignments);
+// protectedRouter.get('/designer/available', requireRole('designer'), designerDashboardController.showAvailable);
+// protectedRouter.post('/designer/claim/:id', requireRole('designer'), designerDashboardController.claimRequest);
+// protectedRouter.post('/designer/complete/:id', requireRole('designer'), designerDashboardController.completeRequest);
 
 /**
  * Admin Routes (to be implemented)
  */
-// protectedRouter.get('/admin/dashboard', adminDashboardController.showDashboard);
-// protectedRouter.get('/admin/users', adminDashboardController.showUsers);
-// protectedRouter.get('/admin/requests', adminDashboardController.showAllRequests);
-// protectedRouter.get('/admin/analytics', adminDashboardController.showAnalytics);
+// protectedRouter.get('/admin/dashboard', requireRole('admin'), adminDashboardController.showDashboard);
+// protectedRouter.get('/admin/users', requireRole('admin'), adminDashboardController.showUsers);
+// protectedRouter.get('/admin/requests', requireRole('admin'), adminDashboardController.showAllRequests);
+// protectedRouter.get('/admin/analytics', requireRole('admin'), adminDashboardController.showAnalytics);
 
 // Mount protected routes
 router.use('/', protectedRouter);
@@ -125,26 +147,30 @@ apiRouter.get('/api/dashboard/stats', clientDashboardController.getStats);
 apiRouter.get('/api/dashboard/usage', clientDashboardController.getUsage);
 
 // Design Request API
-apiRouter.get('/api/requests', clientDashboardController.getRequests);
-apiRouter.post('/api/requests', clientDashboardController.createRequestAPI);
-apiRouter.put('/api/requests/:id', clientDashboardController.updateRequest);
-apiRouter.post('/api/requests/:id/message', clientDashboardController.addMessage);
-apiRouter.post('/api/requests/:id/revision', clientDashboardController.requestRevision);
+apiRouter.get('/api/requests', clientRequestsController.getRequests);
+apiRouter.post('/api/requests', clientRequestsController.createRequestAPI);
+apiRouter.put('/api/requests/:id', clientRequestsController.updateRequest);
+apiRouter.post('/api/requests/:id/message', clientRequestsController.addMessage);
+apiRouter.post('/api/requests/:id/revision', clientRequestsController.requestRevision);
 
 // Subscription API
-apiRouter.get('/api/subscription/tiers', clientDashboardController.getSubscriptionTiers);
-apiRouter.post('/api/subscription/checkout', clientDashboardController.createCheckoutSession);
-apiRouter.post('/api/subscription/cancel', clientDashboardController.cancelSubscription);
+apiRouter.get('/api/subscription/tiers', clientSubscriptionController.getSubscriptionTiers);
+apiRouter.post('/api/subscription/checkout', clientSubscriptionController.createCheckoutSession);
+apiRouter.post('/api/subscription/cancel', clientSubscriptionController.cancelSubscription);
+
+// Settings API
+apiRouter.get('/api/settings/export', clientSettingsController.exportData);
+apiRouter.delete('/api/settings/account', clientSettingsController.deleteAccount);
 
 // Designer API Routes (to be implemented)
-// apiRouter.get('/api/designer/queue', designerDashboardController.getQueue);
-// apiRouter.post('/api/designer/update-status/:id', designerDashboardController.updateStatus);
-// apiRouter.post('/api/designer/upload/:id', designerDashboardController.uploadDesign);
+// apiRouter.get('/api/designer/queue', requireRole('designer'), designerDashboardController.getQueue);
+// apiRouter.post('/api/designer/update-status/:id', requireRole('designer'), designerDashboardController.updateStatus);
+// apiRouter.post('/api/designer/upload/:id', requireRole('designer'), upload.array('designs', 5), designerDashboardController.uploadDesign);
 
 // Admin API Routes (to be implemented)
-// apiRouter.get('/api/admin/stats', adminDashboardController.getSystemStats);
-// apiRouter.get('/api/admin/users', adminDashboardController.getUsers);
-// apiRouter.put('/api/admin/users/:id', adminDashboardController.updateUser);
+// apiRouter.get('/api/admin/stats', requireRole('admin'), adminDashboardController.getSystemStats);
+// apiRouter.get('/api/admin/users', requireRole('admin'), adminDashboardController.getUsers);
+// apiRouter.put('/api/admin/users/:id', requireRole('admin'), adminDashboardController.updateUser);
 
 // Mount API routes
 router.use('/', apiRouter);

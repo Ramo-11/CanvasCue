@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const User = require('../../models/User');
-const Onboarding = require('../../models/Onboarding');
-const SubscriptionTier = require('../../models/SubscriptionTier');
+const User = require('../../../models/User');
+const Onboarding = require('../../../models/Onboarding');
+const SubscriptionTier = require('../../../models/SubscriptionTier');
 const { createAppLogger, createStorageService, createNotificationService } = require('@sahab/core');
 
 const logger = createAppLogger();
@@ -23,6 +23,11 @@ const showOnboarding = async (req, res) => {
             return res.redirect('/login');
         }
 
+        // Only for client role
+        if (user.role !== 'client') {
+            return res.redirect('/dashboard');
+        }
+
         // If onboarding is already complete, redirect to dashboard
         if (user.onboardingCompleted) {
             return res.redirect('/dashboard');
@@ -37,7 +42,7 @@ const showOnboarding = async (req, res) => {
         // Get subscription tiers for display after onboarding
         const tiers = await SubscriptionTier.getActiveTiers();
 
-        res.render('onboarding/index', {
+        res.render('client/onboarding/index', {
             title: "Welcome to CanvasCue - Let's Get Started",
             layout: 'layout',
             showNav: false,

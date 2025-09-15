@@ -1,45 +1,141 @@
+const mongoose = require('mongoose');
 const DesignRequest = require('../../models/DesignRequest');
 
 /**
- * Get request statistics for dashboards
+ * Get request statistics for dashboard
  */
-const getRequestStatistics = async (userId, userType = 'client') => {
+const getRequestStatistics = async (userId, role = 'client') => {
     const filter =
-        userType === 'client'
-            ? { client: userId }
-            : userType === 'designer'
-            ? { designer: userId }
+        role === 'client'
+            ? { client: new mongoose.Types.ObjectId(userId) }
+            : role === 'designer'
+            ? { designer: new mongoose.Types.ObjectId(userId) }
             : {};
 
-    const stats = await DesignRequest.getStatistics(filter);
+    const stats = await DesignRequest.aggregate([
+        { $match: filter },
+        {
+            $facet: {
+                statusCounts: [
+                    {
+                        $group: {
+                            _id: '$status',
+                            count: { $sum: 1 },
+                        },
+                    },
+                ],
+                priorityCounts: [
+                    {
+                        $group: {
+                            _id: '$priority',
+                            count: { $sum: 1 },
+                        },
+                    },
+                ],
+                totals: [
+                    {
+                        $group: {
+                            _id: null,
+                            total: { $sum: 1 },
+                            completed: {
+                                $sum: {
+                                    $cond: [{ $eq: ['$status', 'completed'] }, 1, 0],
+                                },
+                            },
+                            inProgress: {
+                                $sum: {
+                                    $cond: [{ $eq: ['$status', 'in-progress'] }, 1, 0],
+                                },
+                            },
+                            pending: {
+                                $sum: {
+                                    $cond: [{ $eq: ['$status', 'pending-approval'] }, 1, 0],
+                                },
+                            },
+                            draft: {
+                                $sum: {
+                                    $cond: [{ $eq: ['$status', 'draft'] }, 1, 0],
+                                },
+                            },
+                        },
+                    },
+                ],
+                avgMetrics: [
+                    {
+                        $group: {
+                            _id: null,
+                            avgTurnaround: {
+                                $avg: {
+                                    $subtract: ['$timeline.completedAt', '$timeline.submittedAt'],
+                                },
+                            },
+                            avgRevisions: { $avg: '$revisionCount' },
+                            avgRating: { $avg: '$rating.score' },
+                        },
+                    },
+                ],
+                recentActivity: [
+                    { $sort: { updatedAt: -1 } },
+                    { $limit: 5 },
+                    {
+                        $project: {
+                            _id: 1,
+                            title: 1,
+                            status: 1,
+                            updatedAt: 1,
+                        },
+                    },
+                ],
+            },
+        },
+    ]);
 
-    return {
-        total: stats.total || 0,
-        completed: stats.completed || 0,
-        inProgress: stats.inProgress || 0,
-        avgRevisions: Math.round(stats.avgRevisions || 0),
-        avgTurnaround: formatTurnaround(stats.avgTurnaround),
+    const result = stats[0];
+
+    // Format the response
+    const formattedStats = {
+        total: result.totals[0]?.total || 0,
+        completed: result.totals[0]?.completed || 0,
+        inProgress: result.totals[0]?.inProgress || 0,
+        pending: result.totals[0]?.pending || 0,
+        draft: result.totals[0]?.draft || 0,
+        avgTurnaround: formatTurnaround(result.avgMetrics[0]?.avgTurnaround),
+        avgRevisions: Math.round(result.avgMetrics[0]?.avgRevisions || 0),
+        avgRating: parseFloat((result.avgMetrics[0]?.avgRating || 0).toFixed(1)),
+        statusBreakdown: formatBreakdown(result.statusCounts),
+        priorityBreakdown: formatBreakdown(result.priorityCounts),
+        recentActivity: result.recentActivity,
     };
+
+    return formattedStats;
 };
 
 /**
- * Format subscription data for view
+ * Format subscription data for display
  */
 const formatSubscriptionData = (subscription) => {
     if (!subscription) return null;
 
-    const data = subscription.toJSON ? subscription.toJSON() : subscription;
-
-    // Add calculated fields
-    data.usagePercentage = Math.round(
-        (data.usage.designsUsedThisMonth / data.tier.features.designsPerMonth) * 100
-    );
-
-    data.daysUntilRenewal = Math.ceil(
-        (new Date(data.nextBillingDate) - new Date()) / (1000 * 60 * 60 * 24)
-    );
-
-    return data;
+    return {
+        _id: subscription._id,
+        tier: subscription.tier,
+        billingPeriod: subscription.billingPeriod,
+        amount: subscription.amount,
+        currency: subscription.currency,
+        status: subscription.status,
+        usage: {
+            designsUsedThisMonth: subscription.usage.designsUsedThisMonth,
+            activeDesignRequests: subscription.usage.activeDesignRequests,
+            lastResetDate: subscription.usage.lastResetDate,
+        },
+        currentPeriodStart: subscription.currentPeriodStart,
+        currentPeriodEnd: subscription.currentPeriodEnd,
+        nextBillingDate: subscription.nextBillingDate,
+        isActive: subscription.isActive,
+        daysUntilNextBilling: subscription.daysUntilNextBilling,
+        hasReachedDesignLimit: subscription.hasReachedDesignLimit,
+        canAddActiveDesign: subscription.canAddActiveDesign,
+    };
 };
 
 /**
@@ -54,54 +150,131 @@ const formatTurnaround = (milliseconds) => {
         return `${hours} hours`;
     } else {
         const days = Math.round(hours / 24);
-        return `${days} ${days === 1 ? 'day' : 'days'}`;
+        return `${days} day${days !== 1 ? 's' : ''}`;
     }
 };
 
 /**
- * Calculate priority score for request sorting
+ * Format breakdown data
  */
-const calculatePriorityScore = (request) => {
-    let score = 0;
-
-    // Priority levels
-    if (request.priority === 'urgent') score += 100;
-    if (request.priority === 'high') score += 50;
-    if (request.priority === 'normal') score += 25;
-
-    // Age of request (older = higher priority)
-    const ageInHours = (Date.now() - new Date(request.createdAt)) / (1000 * 60 * 60);
-    score += Math.min(ageInHours, 48); // Cap at 48 hours
-
-    // Rush orders
-    if (request.isRushOrder) score += 75;
-
-    return score;
+const formatBreakdown = (data) => {
+    const breakdown = {};
+    data.forEach((item) => {
+        breakdown[item._id] = item.count;
+    });
+    return breakdown;
 };
 
 /**
- * Get available requests for designers
+ * Calculate dashboard metrics
  */
-const getAvailableRequests = async (limit = 10) => {
-    const requests = await DesignRequest.find({
-        status: 'submitted',
-        designer: null,
-    })
-        .populate('client', 'fullName companyName email')
+const calculateDashboardMetrics = async (userId, period = 30) => {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - period);
+
+    const metrics = await DesignRequest.aggregate([
+        {
+            $match: {
+                client: new mongoose.Types.ObjectId(userId),
+                createdAt: { $gte: startDate },
+            },
+        },
+        {
+            $group: {
+                _id: {
+                    $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+                },
+                count: { $sum: 1 },
+                completed: {
+                    $sum: {
+                        $cond: [{ $eq: ['$status', 'completed'] }, 1, 0],
+                    },
+                },
+            },
+        },
+        { $sort: { _id: 1 } },
+    ]);
+
+    return metrics;
+};
+
+/**
+ * Get upcoming deadlines
+ */
+const getUpcomingDeadlines = async (userId, role = 'client', limit = 5) => {
+    const filter = {
+        deadline: { $gte: new Date() },
+        status: { $nin: ['completed', 'canceled'] },
+    };
+
+    if (role === 'client') {
+        filter.client = new mongoose.Types.ObjectId(userId);
+    } else if (role === 'designer') {
+        filter.designer = new mongoose.Types.ObjectId(userId);
+    }
+
+    const deadlines = await DesignRequest.find(filter)
+        .select('title deadline priority status requestNumber')
+        .sort('deadline')
+        .limit(limit)
         .lean();
 
-    // Sort by priority score
-    requests.sort((a, b) => {
-        return calculatePriorityScore(b) - calculatePriorityScore(a);
-    });
+    return deadlines;
+};
 
-    return requests.slice(0, limit);
+/**
+ * Get activity feed
+ */
+const getActivityFeed = async (userId, role = 'client', limit = 10) => {
+    const Message = require('../../models/Message');
+
+    // Get recent messages
+    const messageFilter =
+        role === 'client'
+            ? { $or: [{ sender: userId }, { recipient: userId }] }
+            : { $or: [{ sender: userId }, { recipient: userId }] };
+
+    const messages = await Message.find(messageFilter)
+        .populate('designRequest', 'title requestNumber')
+        .populate('sender', 'fullName role')
+        .sort('-createdAt')
+        .limit(limit / 2)
+        .lean();
+
+    // Get recent status changes
+    const requestFilter = role === 'client' ? { client: userId } : { designer: userId };
+
+    const statusChanges = await DesignRequest.find(requestFilter)
+        .select('title requestNumber status updatedAt')
+        .sort('-updatedAt')
+        .limit(limit / 2)
+        .lean();
+
+    // Combine and sort activities
+    const activities = [
+        ...messages.map((m) => ({
+            type: 'message',
+            title: `New message on ${m.designRequest?.title || 'request'}`,
+            timestamp: m.createdAt,
+            data: m,
+        })),
+        ...statusChanges.map((s) => ({
+            type: 'status_change',
+            title: `${s.title} status changed to ${s.status}`,
+            timestamp: s.updatedAt,
+            data: s,
+        })),
+    ];
+
+    // Sort by timestamp and limit
+    activities.sort((a, b) => b.timestamp - a.timestamp);
+    return activities.slice(0, limit);
 };
 
 module.exports = {
     getRequestStatistics,
     formatSubscriptionData,
-    formatTurnaround,
-    calculatePriorityScore,
-    getAvailableRequests,
+    calculateDashboardMetrics,
+    getUpcomingDeadlines,
+    getActivityFeed,
 };
